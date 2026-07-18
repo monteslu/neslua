@@ -2,9 +2,10 @@
 
 [![npm version](https://img.shields.io/npm/v/neslua.svg)](https://www.npmjs.com/package/neslua) [![npm downloads](https://img.shields.io/npm/dm/neslua.svg)](https://www.npmjs.com/package/neslua)
 
-**PICO-8-flavored Lua, compiled to a real NES `.nes` ROM.** Zero native tools -
-the cc65 toolchain runs as bundled WebAssembly. neslua is the NES member of the
-[luacretro](https://github.com/monteslu) console SDK family (GameTank, GBA,
+**PICO-8-flavored Lua, ahead-of-time compiled to a real NES `.nes` ROM.** No
+interpreter, no VM: your Lua becomes native 6502 machine code. Zero native tools,
+either - the cc65 toolchain runs as bundled WebAssembly. neslua is the NES member
+of the [luacretro](https://github.com/monteslu) console SDK family (GameTank, GBA,
 Genesis, NES, C64), sharing one statically-typed Lua-to-C front-end.
 
 ```lua
