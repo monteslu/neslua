@@ -23,18 +23,19 @@ static void lcl__update60(void)
     if (((nes_pad0 & 2056u) != 0)) {
         lcl_y = (lcl_y - 2);
     }
-    lcl_x = ((8 < lcl_x) ? ((lcl_x < 240) ? (lcl_x) : (((unsigned char)8 < (unsigned char)240) ? (240) : (8))) : (((unsigned char)8 < (unsigned char)240) ? (8) : ((lcl_x < 240) ? (240) : (lcl_x))));
-    lcl_y = ((16 < lcl_y) ? ((lcl_y < 208) ? (lcl_y) : (((unsigned char)16 < (unsigned char)208) ? (208) : (16))) : (((unsigned char)16 < (unsigned char)208) ? (16) : ((lcl_y < 208) ? (208) : (lcl_y))));
+    lcl_x = ((8 < lcl_x) ? ((lcl_x < 232) ? (lcl_x) : (((unsigned char)8 < (unsigned char)232) ? (232) : (8))) : (((unsigned char)8 < (unsigned char)232) ? (8) : ((lcl_x < 232) ? (232) : (lcl_x))));
+    lcl_y = ((16 < lcl_y) ? ((lcl_y < 200) ? (lcl_y) : (((unsigned char)16 < (unsigned char)200) ? (200) : (16))) : (((unsigned char)16 < (unsigned char)200) ? (16) : ((lcl_y < 200) ? (200) : (lcl_y))));
 }
 
 static void lcl__draw(void)
 {
     if ((lcl_ready == 0)) {
-        nes_cls(17);
-        nes_print("hello neslua", 72, 96, 48);
+        nes_cls(15);
+        nes_print("hello neslua", 72, 88, 48);
         lcl_ready = 1;
     }
-    (nes_a0 = 1, nes_a1 = lcl_x, nes_a2 = lcl_y, nes_a3 = 1, nes_a4 = 1, nes_a5 = 0 | (0 << 1), nes_spr_z());
+    nes_spal(1);
+    (nes_a0 = 0, nes_a1 = lcl_x, nes_a2 = lcl_y, nes_a3 = 2, nes_a4 = 2, nes_a5 = 0 | (0 << 1), nes_spr_z());
 }
 
 void main(void)

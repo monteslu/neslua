@@ -19,41 +19,42 @@ local ready = 0
 local x = 120
 local y = 120
 
-function _update60()             -- 60fps: read the d-pad, move the sprite
+function _update60()             -- 60fps: read the d-pad, move the ship
   if (btn(1)) then x += 2 end    -- right
   if (btn(0)) then x -= 2 end    -- left
   if (btn(3)) then y += 2 end    -- down
   if (btn(2)) then y -= 2 end    -- up
-  x = mid(8, x, 240)             -- keep it on the visible screen
-  y = mid(16, y, 208)
+  x = mid(8, x, 232)             -- keep the 16px-wide ship on screen
+  y = mid(16, y, 200)
 end
 
 function _draw()
   if (ready == 0) then           -- background tiles: draw the greeting once
-    cls(12)                      -- sky-blue backdrop
-    print("hello neslua", 72, 96, 7)
+    cls(0)                       -- black backdrop (space)
+    print("hello neslua", 72, 88, 7)
     ready = 1
   end
-  spr(1, x, y)                   -- one hardware sprite, redrawn every frame
+  nes.spal(1)                    -- cyan sprite sub-palette
+  spr(0, x, y, 2, 2)             -- the ship (16x16 sprite), redrawn every frame
 end
 ```
 
-> **Why the greeting is drawn once.** The moving thing is a real hardware
-> sprite: `spr(1, x, y)` pushes a tile into shadow OAM, DMA'd to the PPU every
-> frame, so it costs nothing to redraw and moves freely. The greeting is
+Build it with the sprite sheet (a PNG imported to CHR):
+
+```sh
+npx neslua run examples/hello/main.lua --sheet examples/hello/ship.chr
+```
+
+> **Why the greeting is drawn once.** The ship is a real hardware sprite:
+> `spr(0, x, y, 2, 2)` pushes a 16x16 sprite into shadow OAM, DMA'd to the PPU
+> every frame, so it costs nothing to redraw and moves freely. The greeting is
 > *background* tiles, written through a queue that drains only ~16 tiles/frame -
 > so you write it once (the `ready` guard) and never repaint it. Cheap sprites
 > over a static background is how the NES animates - not a full-screen repaint.
 > See [docs/DIFFERENCES.md](docs/DIFFERENCES.md).
 
-Build it and play it in a window:
-
-```sh
-npx neslua run examples/hello/main.lua
-```
-
 <p align="center">
-  <img src="https://raw.githubusercontent.com/monteslu/neslua/main/examples/hello/screenshot.png" width="480" alt="hello neslua: a red hardware sprite below the greeting on a sky-blue NES screen">
+  <img src="https://raw.githubusercontent.com/monteslu/neslua/main/examples/hello/screenshot.png" width="480" alt="hello neslua: a cyan spaceship sprite below the greeting on a black NES screen">
 </p>
 
 ## Featured example: a full shmup
@@ -76,7 +77,7 @@ Or build the cartridge - a byte-for-byte `.nes` that runs on any emulator or rea
 hardware:
 
 ```sh
-npx neslua build examples/hello/main.lua -o hello.nes
+npx neslua build examples/hello/main.lua --sheet examples/hello/ship.chr -o hello.nes
 ```
 
 That's the whole loop: write `main.lua`, `run` it, ship the `.nes`. (`npx neslua
