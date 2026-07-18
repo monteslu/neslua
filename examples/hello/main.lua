@@ -17,14 +17,12 @@ function _init()
   nes.canvas_at(6, 6, 13, 9)
   -- paint the smiley ONCE into the canvas buffer (it uploads a tile per frame).
   circfill(24, 24, 22, 1)     -- filled face
-  circfill(16, 18, 3, 0)      -- left eye (cleared)
-  circfill(32, 18, 3, 0)      -- right eye (cleared)
-  line(14, 30, 20, 36, 0)     -- smile (cut out of the lower face)
-  line(20, 36, 28, 36, 0)
-  line(28, 36, 34, 30, 0)
-  line(14, 31, 20, 37, 0)
-  line(20, 37, 28, 37, 0)
-  line(28, 37, 34, 31, 0)
+  circfill(15, 19, 4, 0)      -- left eye (cut out)
+  circfill(33, 19, 4, 0)      -- right eye (cut out)
+  -- a wide grin: cut a big disc out of the lower face, then re-fill its top
+  -- half, leaving a crescent smile.
+  circfill(24, 27, 13, 0)
+  circfill(24, 21, 14, 1)
 end
 
 function _draw()

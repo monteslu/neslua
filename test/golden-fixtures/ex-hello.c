@@ -11,14 +11,10 @@ static void gtl__init(void)
 {
     nes_canvas_at(6, 6, 13, 9);
     (nes_a0 = 24, nes_a1 = 24, nes_a2 = 22, nes_a3 = 2, nes_circfill_z());
-    (nes_a0 = 16, nes_a1 = 18, nes_a2 = 3, nes_a3 = 15, nes_circfill_z());
-    (nes_a0 = 32, nes_a1 = 18, nes_a2 = 3, nes_a3 = 15, nes_circfill_z());
-    (nes_a0 = 14, nes_a1 = 30, nes_a2 = 20, nes_a3 = 36, nes_a4 = 15, nes_line_z());
-    (nes_a0 = 20, nes_a1 = 36, nes_a2 = 28, nes_a3 = 36, nes_a4 = 15, nes_line_z());
-    (nes_a0 = 28, nes_a1 = 36, nes_a2 = 34, nes_a3 = 30, nes_a4 = 15, nes_line_z());
-    (nes_a0 = 14, nes_a1 = 31, nes_a2 = 20, nes_a3 = 37, nes_a4 = 15, nes_line_z());
-    (nes_a0 = 20, nes_a1 = 37, nes_a2 = 28, nes_a3 = 37, nes_a4 = 15, nes_line_z());
-    (nes_a0 = 28, nes_a1 = 37, nes_a2 = 34, nes_a3 = 31, nes_a4 = 15, nes_line_z());
+    (nes_a0 = 15, nes_a1 = 19, nes_a2 = 4, nes_a3 = 15, nes_circfill_z());
+    (nes_a0 = 33, nes_a1 = 19, nes_a2 = 4, nes_a3 = 15, nes_circfill_z());
+    (nes_a0 = 24, nes_a1 = 27, nes_a2 = 13, nes_a3 = 15, nes_circfill_z());
+    (nes_a0 = 24, nes_a1 = 21, nes_a2 = 14, nes_a3 = 2, nes_circfill_z());
 }
 
 static void gtl__draw(void)

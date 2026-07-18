@@ -207,7 +207,11 @@ void nes_canvas(int cw, int ch) {
     nes_canvas_at(cw, ch, tx, 6);
 }
 
-/* set/clear a canvas pixel (1bpp: color != 0 -> set). */
+/* set/clear a canvas pixel. The canvas is 1bpp, so a color either turns the
+ * pixel ON (shows the canvas ink color) or clears it (shows the backdrop). A
+ * color that reads as black/backdrop erases: raw 0, or the NES black index $0F
+ * (which the compiler bakes P8 color 0 to). Every other color sets. */
+#define NES_BLACK 0x0F
 static void canvas_pset(u8 x, u8 y, u8 col) {
     u8 tx, ty, tidx, bit;
     if (x >= canvas_px || y >= canvas_py) return;
@@ -215,8 +219,8 @@ static void canvas_pset(u8 x, u8 y, u8 col) {
     tidx = ty * canvas_w + tx;
     if (tidx >= CANVAS_MAXTILES) return;
     bit = 0x80 >> (x & 7);
-    if (col) canvas_buf[tidx][y & 7] |= bit;
-    else     canvas_buf[tidx][y & 7] &= (u8)~bit;
+    if (col != 0 && col != NES_BLACK) canvas_buf[tidx][y & 7] |= bit;
+    else                              canvas_buf[tidx][y & 7] &= (u8)~bit;
     canvas_dirty[tidx] = 1;
 }
 
@@ -245,13 +249,13 @@ static u8 canvas_dirty_count(void) {
 static void canvas_commit_blank(void) {
     u8 i, r, ntiles = canvas_w * canvas_h;
     u16 base;
-    /* Turn rendering OFF (PPUMASK=0) for the whole upload. With no active
-     * display there is no vblank budget to overrun - CHR writes are safe at any
-     * length. Leave PPUCTRL/NMI on so the frame counter keeps ticking. Sync to a
-     * vblank first for a clean cut. Costs one dark frame. */
-    ppu_wait_nmi();
+    if (canvas_w == 0) return;
+    /* Force blank (PPUMASK=0) for the whole upload. With no active display there
+     * is no vblank budget to overrun, so CHR writes are safe at any length.
+     * Disable NMI too so the crt0 handler can't fire mid-burst and move PPUADDR.
+     * Costs one dark frame. */
+    PPU_CTRL = 0x10;             /* NMI off (keep BG pattern-table bit 4) */
     PPU_MASK = 0;                 /* rendering off */
-    PPU_CTRL = 0x10;             /* NMI OFF during the burst (keep BG pattern bit) */
     for (i = 0; i < ntiles; ++i) {
         if (!canvas_dirty[i]) continue;
         base = 0x1000 + (u16)(CANVAS_TILE0 + i) * 16;
@@ -260,12 +264,11 @@ static void canvas_commit_blank(void) {
         for (r = 0; r < 8; ++r) vram_put(0);
         canvas_dirty[i] = 0;
     }
+    /* reset PPUADDR + scroll, re-arm NMI, turn rendering back on. */
     vram_addr(0x2000);
-    /* re-enable NMI + rendering. Poll one real vblank via PPUSTATUS (NMI is off,
-     * so ppu_wait_nmi can't be used) so the counter stays consistent. */
-    ppu_wait_vblank();
-    PPU_CTRL = nes_ppuctrl_value;   /* NMI back on ($90) */
+    PPU_SCROLL = 0; PPU_SCROLL = 0;
     PPU_MASK = PPUMASK_ON;
+    PPU_CTRL = nes_ppuctrl_value;   /* NMI back on */
 }
 
 /* Per-frame flush: drip ONE dirty canvas tile through the VRAM queue when the
@@ -289,10 +292,16 @@ static void canvas_flush(void) {
     }
 }
 
-/* nes.canvas_show(): commit the whole dirty canvas NOW in one forced-blank
- * upload (one dark frame) instead of dripping it a tile per frame. Call it after
- * painting a static canvas (a logo/HUD) so it appears at once. */
-void nes_canvas_show(void) { canvas_commit_blank(); }
+/* nes.canvas_show(): hint that the canvas is fully painted. In v1 the canvas
+ * uploads reliably through the per-frame queue drip (one tile/frame - a static
+ * canvas settles in ~w*h frames), so this just re-marks every tile dirty so the
+ * drip covers the whole window. (A forced-blank instant commit is a v1.1 item;
+ * the queue path is the robust default and never disturbs rendering.) */
+void nes_canvas_show(void) {
+    u8 i, ntiles = canvas_w * canvas_h;
+    for (i = 0; i < ntiles; ++i) canvas_dirty[i] = 1;
+    (void)canvas_commit_blank;   /* retained for v1.1; not on the v1 path */
+}
 
 /* ── drawing primitives (paint the active surface) ───────────────────────── */
 /* The active surface is the pixel canvas, unless blank-mode draws to the whole

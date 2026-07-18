@@ -96,7 +96,7 @@ void nes_spr_z(void);
 void nes_flicker(int on);                     /* OAM rotation for >8/scanline crowds */
 
 /* ── pixel canvas (constrained P8 drawing) ───────────────────────────────── */
-/* canvas(cw,ch): reserve a cw x ch TILE window (cap 32 tiles) of CHR-RAM at a
+/* canvas(cw,ch): reserve a cw x ch TILE window (cap 64 tiles) of CHR-RAM at a
  * fixed nametable region; the P8 verbs draw into a CPU-side 2bpp buffer that
  * uploads a few dirty tiles per vblank. One BG palette (3 colors + backdrop). */
 void nes_canvas(int cw, int ch);
