@@ -8,57 +8,42 @@ either - the cc65 toolchain runs as bundled WebAssembly. neslua is the NES membe
 of the [luacretro](https://github.com/monteslu) console SDK family (GameTank, GBA,
 Genesis, NES, C64), sharing one statically-typed Lua-to-C front-end.
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/monteslu/neslua/main/examples/starfall/screenshot.png" width="480" alt="starfall: a complete NES shmup - a staggered formation of red invaders, a cyan player ship firing a green bolt, over a starfield with a score/lives HUD">
-</p>
-
-That is [`examples/starfall`](examples/starfall) - a complete shmup in ~200
-lines of Lua: a staggered invader formation (all 12 on-screen within the NES's
-8-sprites-per-scanline limit), a ship you fly and fire, collisions, score/lives,
-and a background-tile starfield. Build and play it:
-
-```sh
-npx neslua run examples/starfall/main.lua --sheet examples/starfall/shmup_sheet.chr
-```
-
 ## Your first game
 
-A complete NES game - one `main.lua`: a hardware sprite you move with the
-d-pad, plus a greeting. Here's the core loop; `examples/hello/main.lua` builds
-on it with a whole swarm of bouncing sprites (the screenshot below).
-`_update60` runs the movement 60 times a second; `_draw` redraws the sprite
-every frame:
+The whole hello, one `main.lua`: a greeting plus a hardware sprite you move with
+the d-pad. `_update60` runs the movement 60 times a second; `_draw` redraws the
+sprite every frame (`examples/hello/main.lua`):
 
 ```lua
 local ready = 0
 local x = 120
-local y = 112
+local y = 120
 
-function _update60()               -- 60fps input + movement
-  if (btn(1)) then x += 2 end      -- right
-  if (btn(0)) then x -= 2 end      -- left
-  if (btn(3)) then y += 2 end      -- down
-  if (btn(2)) then y -= 2 end      -- up
-  x = mid(8, x, 240)               -- clamp to the visible playfield
+function _update60()             -- 60fps: read the d-pad, move the sprite
+  if (btn(1)) then x += 2 end    -- right
+  if (btn(0)) then x -= 2 end    -- left
+  if (btn(3)) then y += 2 end    -- down
+  if (btn(2)) then y -= 2 end    -- up
+  x = mid(8, x, 240)             -- keep it on the visible screen
   y = mid(16, y, 208)
 end
 
 function _draw()
-  if (ready == 0) then             -- static backdrop + greeting: draw once
-    cls(12)                        -- sky-blue backdrop
-    print("hello neslua", 72, 32, 7)
+  if (ready == 0) then           -- background tiles: draw the greeting once
+    cls(12)                      -- sky-blue backdrop
+    print("hello neslua", 72, 96, 7)
     ready = 1
   end
-  spr(1, x, y)                     -- the hardware sprite, redrawn every frame
+  spr(1, x, y)                   -- one hardware sprite, redrawn every frame
 end
 ```
 
-> The NES is a tile+sprite machine. The square is a real hardware sprite -
-> `spr(1, x, y)` pushes the built-in solid-block tile into shadow OAM, DMA'd to
-> the PPU every frame, so it moves freely and costs nothing to redraw. The
-> greeting is background tiles written through a queue that drains ~16
-> tiles/frame, so we lay it down once (the guard) and never repaint it. That
-> split - cheap sprites, static background - is how the NES actually animates.
+> **Why the greeting is drawn once.** The moving thing is a real hardware
+> sprite: `spr(1, x, y)` pushes a tile into shadow OAM, DMA'd to the PPU every
+> frame, so it costs nothing to redraw and moves freely. The greeting is
+> *background* tiles, written through a queue that drains only ~16 tiles/frame -
+> so you write it once (the `ready` guard) and never repaint it. Cheap sprites
+> over a static background is how the NES animates - not a full-screen repaint.
 > See [docs/DIFFERENCES.md](docs/DIFFERENCES.md).
 
 Build it and play it in a window:
@@ -68,8 +53,24 @@ npx neslua run examples/hello/main.lua
 ```
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/monteslu/neslua/main/examples/hello/screenshot.png" width="480" alt="hello neslua: a player block and a swarm of bouncing ball and diamond hardware sprites under 'hello neslua' text on a sky-blue NES screen">
+  <img src="https://raw.githubusercontent.com/monteslu/neslua/main/examples/hello/screenshot.png" width="480" alt="hello neslua: a red hardware sprite below the greeting on a sky-blue NES screen">
 </p>
+
+## Featured example: a full shmup
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/monteslu/neslua/main/examples/starfall/screenshot.png" width="480" alt="starfall: a complete NES shmup - a staggered formation of red invaders, a cyan player ship firing a green bolt, over a starfield with a score/lives HUD">
+</p>
+
+[`examples/starfall`](examples/starfall) is a complete shmup in ~200 lines of
+Lua: a staggered invader formation (all 12 on-screen within the NES's
+8-sprites-per-scanline limit), a ship you fly and fire, collisions, score/lives,
+and a background-tile starfield. Sprite art is imported from a PNG. Build and
+play it:
+
+```sh
+npx neslua run examples/starfall/main.lua --sheet examples/starfall/shmup_sheet.chr
+```
 
 Or build the cartridge - a byte-for-byte `.nes` that runs on any emulator or real
 hardware:
@@ -118,7 +119,8 @@ Each builds to a `.nes` and runs on the emulator (real captured frames below):
 - [`starfall`](examples/starfall) - a complete shmup: staggered invaders, a
   ship that flies and fires, collisions, score/lives, a starfield (the hero
   image above). Shows the sprite-budget discipline the NES demands.
-- [`hello`](examples/hello) - a smiley + centered text (the family hello).
+- [`hello`](examples/hello) - a greeting + a hardware sprite you move (the
+  simplest idiomatic NES program).
 - [`pad-square`](examples/pad-square) - move a sprite with the d-pad.
 - [`mathcheck`](examples/mathcheck) - the 16.16 fixed-point conformance cart.
 - [`canvas`](examples/canvas) - the pixel-canvas surface: a vector logo.

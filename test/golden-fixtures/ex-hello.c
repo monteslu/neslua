@@ -2,30 +2,12 @@
 #include "nes_api.h"
 #include "nes_math.h"
 
-static void lcl__init(void);
 static void lcl__update60(void);
 static void lcl__draw(void);
 
 int lcl_ready = 0;
 int lcl_x = 120;
-int lcl_y = 180;
-int lcl_n = 6;
-int lcl_sx[6];
-int lcl_sy[6];
-int lcl_vx[6];
-int lcl_vy[6];
-
-static void lcl__init(void)
-{
-    { int lcl_i = 1; int L_lim0 = lcl_n;
-        for (; lcl_i <= L_lim0; ++lcl_i) {
-            lcl_sx[lcl_i - 1] = (24 + (((lcl_i) << 5)));
-            lcl_sy[lcl_i - 1] = (48 + (((nes_ifmod(lcl_i, 3)) << 4) + ((nes_ifmod(lcl_i, 3)) << 3)));
-            lcl_vx[lcl_i - 1] = (1 + (lcl_i & 1));
-            lcl_vy[lcl_i - 1] = 1;
-        }
-    }
-}
+int lcl_y = 120;
 
 static void lcl__update60(void)
 {
@@ -43,31 +25,14 @@ static void lcl__update60(void)
     }
     lcl_x = ((8 < lcl_x) ? ((lcl_x < 240) ? (lcl_x) : (((unsigned char)8 < (unsigned char)240) ? (240) : (8))) : (((unsigned char)8 < (unsigned char)240) ? (8) : ((lcl_x < 240) ? (240) : (lcl_x))));
     lcl_y = ((16 < lcl_y) ? ((lcl_y < 208) ? (lcl_y) : (((unsigned char)16 < (unsigned char)208) ? (208) : (16))) : (((unsigned char)16 < (unsigned char)208) ? (16) : ((lcl_y < 208) ? (208) : (lcl_y))));
-    { int lcl_i = 1; int L_lim1 = lcl_n;
-        for (; lcl_i <= L_lim1; ++lcl_i) {
-            lcl_sx[lcl_i - 1] = (lcl_sx[lcl_i - 1] + lcl_vx[lcl_i - 1]);
-            lcl_sy[lcl_i - 1] = (lcl_sy[lcl_i - 1] + lcl_vy[lcl_i - 1]);
-            if (((lcl_sx[lcl_i - 1] < 8) || (lcl_sx[lcl_i - 1] > 240))) {
-                lcl_vx[lcl_i - 1] = (-lcl_vx[lcl_i - 1]);
-            }
-            if (((lcl_sy[lcl_i - 1] < 48) || (lcl_sy[lcl_i - 1] > 150))) {
-                lcl_vy[lcl_i - 1] = (-lcl_vy[lcl_i - 1]);
-            }
-        }
-    }
 }
 
 static void lcl__draw(void)
 {
     if ((lcl_ready == 0)) {
         nes_cls(17);
-        nes_print("hello neslua", 72, 24, 48);
+        nes_print("hello neslua", 72, 96, 48);
         lcl_ready = 1;
-    }
-    { int lcl_i = 1; int L_lim2 = lcl_n;
-        for (; lcl_i <= L_lim2; ++lcl_i) {
-            (nes_a0 = (2 + (lcl_i & 1)), nes_a1 = lcl_sx[lcl_i - 1], nes_a2 = lcl_sy[lcl_i - 1], nes_a3 = 1, nes_a4 = 1, nes_a5 = 0 | (0 << 1), nes_spr_z());
-        }
     }
     (nes_a0 = 1, nes_a1 = lcl_x, nes_a2 = lcl_y, nes_a3 = 1, nes_a4 = 1, nes_a5 = 0 | (0 << 1), nes_spr_z());
 }
@@ -75,7 +40,6 @@ static void lcl__draw(void)
 void main(void)
 {
     nes_init();
-    lcl__init();
     for (;;) {
         nes_update_inputs();
         nes_oam_clear();
