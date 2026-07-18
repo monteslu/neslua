@@ -1,6 +1,6 @@
 # neslua
 
-[![npm version](https://img.shields.io/npm/v/neslua.svg)](https://www.npmjs.com/package/neslua) [![npm downloads](https://img.shields.io/npm/dm/neslua.svg)](https://www.npmjs.com/package/neslua)
+[![npm version](https://img.shields.io/npm/v/neslua.svg)](https://www.npmjs.com/package/neslua)
 
 **PICO-8-flavored Lua, ahead-of-time compiled to a real NES `.nes` ROM.** No
 interpreter, no VM: your Lua becomes native 6502 machine code. Zero native tools,
@@ -8,31 +8,50 @@ either - the cc65 toolchain runs as bundled WebAssembly. neslua is the NES membe
 of the [luacretro](https://github.com/monteslu) console SDK family (GameTank, GBA,
 Genesis, NES, C64), sharing one statically-typed Lua-to-C front-end.
 
+## Your first game
+
+A complete NES game - one `main.lua`. It opens a pixel-drawing canvas, paints a
+smiley into it, and prints a greeting (see `examples/hello/main.lua`):
+
 ```lua
 function _init()
-  nes.canvas_at(6, 6, 13, 9)   -- a pixel-drawing window
-  circfill(24, 24, 22, 1)      -- a smiley
-  circfill(16, 18, 3, 0)  circfill(32, 18, 3, 0)
-  line(14, 30, 20, 36, 0)  line(20, 36, 28, 36, 0)  line(28, 36, 34, 30, 0)
+  nes.canvas_at(6, 6, 13, 9)   -- a 48x48 pixel-drawing window, centered
+  circfill(24, 24, 22, 1)      -- filled face
+  circfill(15, 19, 4, 0)       -- left eye (cut out)
+  circfill(33, 19, 4, 0)       -- right eye
+  circfill(24, 27, 13, 0)      -- carve a grin...
+  circfill(24, 21, 14, 1)      -- ...leaving a crescent smile
 end
 
 local ready = 0
 function _draw()
   if (ready == 0) then
-    cls(1)                                    -- dark-blue backdrop
-    print("hello from neslua", 60, 176, 7)     -- centered greeting
+    cls(1)                              -- dark-blue backdrop (drawn once)
+    print("hello from neslua", 60, 176, 7)
     ready = 1
   end
 end
 ```
 
-![hello](examples/hello/screenshot.png)
+Build it and play it in a window:
 
+```sh
+npx neslua run examples/hello/main.lua
 ```
-neslua build main.lua -o game.nes    # build a cartridge (bundled cc65 WASM)
-neslua run   main.lua                 # build + play in a window
-neslua c     main.lua                 # print the generated C (debugging)
+
+<p align="center">
+  <img src="examples/hello/screenshot.png" width="480" alt="hello from neslua: a white smiley on a dark blue NES screen">
+</p>
+
+Or build the cartridge - a byte-for-byte `.nes` that runs on any emulator or real
+hardware:
+
+```sh
+npx neslua build examples/hello/main.lua -o hello.nes
 ```
+
+That's the whole loop: write `main.lua`, `run` it, ship the `.nes`. (`npx neslua
+c main.lua` prints the generated C, for debugging.)
 
 ## Why neslua
 
@@ -79,14 +98,13 @@ Each builds to a `.nes` and runs on the emulator (real captured frames below):
 - [DIFFERENCES.md](docs/DIFFERENCES.md) - how the NES differs from PICO-8.
 - [ASSETS.md](docs/ASSETS.md) - PNG -> CHR, tilemaps, color rules.
 
-## Install
+## Requirements
 
-```
-npm install
-```
-
-Pulls in `luacretro` (the shared front-end), `romdev-toolchain-cc65` (the cc65
-WASM), and `romdev-core-fceumm` (the emulator core for `neslua run`).
+[Node.js](https://nodejs.org/) **24+**, and nothing else. `npm install` pulls in
+`luacretro` (the shared front-end), `romdev-toolchain-cc65` (the cc65 toolchain
+as WebAssembly), and `romdev-core-fceumm` (the emulator core for `neslua run`,
+which also needs the optional `@kmamal/sdl` for the window). No native compiler
+or emulator to install.
 
 ## License
 
