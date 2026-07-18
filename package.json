@@ -33,5 +33,39 @@
     "romdev-core-fceumm": "^0.11.0",
     "romdev-core-runner": "0.1.0",
     "romdev-toolchain-cc65": "0.1.3"
+  },
+  "keywords": [
+    "lua",
+    "pico-8",
+    "pico8",
+    "gamedev",
+    "game-development",
+    "retro",
+    "retrogaming",
+    "homebrew",
+    "rom",
+    "wasm",
+    "webassembly",
+    "ahead-of-time",
+    "aot",
+    "nes",
+    "famicom",
+    "nintendo",
+    "6502",
+    "cc65",
+    "fceumm",
+    "8-bit",
+    "cartridge",
+    "nes-rom",
+    "sprites",
+    "mmc1"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/monteslu/neslua.git"
+  },
+  "homepage": "https://github.com/monteslu/neslua#readme",
+  "bugs": {
+    "url": "https://github.com/monteslu/neslua/issues"
   }
 }
