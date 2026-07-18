@@ -1,0 +1,27 @@
+{
+  "name": "neslua",
+  "version": "0.1.0",
+  "description": "PICO-8-flavored Lua compiled to a real NES (.nes) ROM. Zero native tools: the cc65 toolchain runs as bundled WASM. The NES member of the luacretro console SDK family.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Luis Montes",
+  "engines": { "node": ">=24" },
+  "bin": {
+    "neslua": "bin/neslua.js"
+  },
+  "exports": {
+    ".": "./compiler/index.js",
+    "./package.json": "./package.json"
+  },
+  "files": ["compiler", "sdk", "bin", "docs", "README.md", "LICENSE"],
+  "scripts": {
+    "test": "node --test 'test/**/*.test.js'",
+    "golden": "node test/golden-c.mjs check",
+    "golden:snapshot": "node test/golden-c.mjs snapshot"
+  },
+  "dependencies": {
+    "luacretro": "^0.0.1",
+    "romdev-toolchain-cc65": "0.1.3",
+    "romdev-core-fceumm": "^0.11.0"
+  }
+}
