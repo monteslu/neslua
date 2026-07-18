@@ -5,7 +5,6 @@
 static void lcl__update60(void);
 static void lcl__draw(void);
 
-int lcl_ready = 0;
 int lcl_x = 120;
 int lcl_y = 120;
 
@@ -29,11 +28,8 @@ static void lcl__update60(void)
 
 static void lcl__draw(void)
 {
-    if ((lcl_ready == 0)) {
-        nes_cls(15);
-        nes_print("hello neslua", 72, 88, 48);
-        lcl_ready = 1;
-    }
+    nes_cls(15);
+    nes_print("hello neslua", 72, 88, 48);
     nes_spal(1);
     (nes_a0 = 0, nes_a1 = lcl_x, nes_a2 = lcl_y, nes_a3 = 2, nes_a4 = 2, nes_a5 = 0 | (0 << 1), nes_spr_z());
 }

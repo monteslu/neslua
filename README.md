@@ -15,7 +15,6 @@ the d-pad. `_update60` runs the movement 60 times a second; `_draw` redraws the
 sprite every frame (`examples/hello/main.lua`):
 
 ```lua
-local ready = 0
 local x = 120
 local y = 120
 
@@ -28,14 +27,11 @@ function _update60()             -- 60fps: read the d-pad, move the ship
   y = mid(16, y, 200)
 end
 
-function _draw()
-  if (ready == 0) then           -- background tiles: draw the greeting once
-    cls(0)                       -- black backdrop (space)
-    print("hello neslua", 72, 88, 7)
-    ready = 1
-  end
+function _draw()                 -- runs every frame
+  cls(0)                         -- black backdrop (space)
+  print("hello neslua", 72, 88, 7)
   nes.spal(1)                    -- cyan sprite sub-palette
-  spr(0, x, y, 2, 2)             -- the ship (16x16 sprite), redrawn every frame
+  spr(0, x, y, 2, 2)             -- the ship (16x16), redrawn every frame
 end
 ```
 
@@ -44,14 +40,6 @@ Build it with the sprite sheet (a PNG imported to CHR):
 ```sh
 npx neslua run examples/hello/main.lua --sheet examples/hello/ship.chr
 ```
-
-> **Why the greeting is drawn once.** The ship is a real hardware sprite:
-> `spr(0, x, y, 2, 2)` pushes a 16x16 sprite into shadow OAM, DMA'd to the PPU
-> every frame, so it costs nothing to redraw and moves freely. The greeting is
-> *background* tiles, written through a queue that drains only ~16 tiles/frame -
-> so you write it once (the `ready` guard) and never repaint it. Cheap sprites
-> over a static background is how the NES animates - not a full-screen repaint.
-> See [docs/DIFFERENCES.md](docs/DIFFERENCES.md).
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/monteslu/neslua/main/examples/hello/screenshot.png" width="480" alt="hello neslua: a cyan spaceship sprite below the greeting on a black NES screen">
