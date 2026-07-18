@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "luacretro": "^0.1.0",
-    "romdev-toolchain-cc65": "0.1.3",
-    "romdev-core-fceumm": "^0.11.0"
+    "romdev-core-fceumm": "^0.11.0",
+    "romdev-toolchain-cc65": "0.1.3"
   }
 }
