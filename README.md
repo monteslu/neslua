@@ -10,12 +10,16 @@ Genesis, NES, C64), sharing one statically-typed Lua-to-C front-end.
 
 ## Your first game
 
-A complete NES game - one `main.lua`. It opens a pixel-drawing canvas, paints a
-smiley into it, and prints a greeting (see `examples/hello/main.lua`):
+A complete NES game - one `main.lua`. `_init` runs once at boot, `_draw` every
+frame (see `examples/hello/main.lua`):
 
 ```lua
+local ready = 0
+
 function _init()
-  nes.canvas_at(6, 6, 13, 9)   -- a 48x48 pixel-drawing window, centered
+  -- one-time setup: open a 48x48 pixel canvas and paint the smiley into its
+  -- buffer once (the canvas then auto-uploads a tile per frame - see below).
+  nes.canvas_at(6, 6, 13, 9)
   circfill(24, 24, 22, 1)      -- filled face
   circfill(15, 19, 4, 0)       -- left eye (cut out)
   circfill(33, 19, 4, 0)       -- right eye
@@ -23,15 +27,18 @@ function _init()
   circfill(24, 21, 14, 1)      -- ...leaving a crescent smile
 end
 
-local ready = 0
-function _draw()
-  if (ready == 0) then
-    cls(1)                              -- dark-blue backdrop (drawn once)
-    print("hello from neslua", 60, 176, 7)
-    ready = 1
-  end
+function _draw()               -- runs every frame
+  if (ready == 1) then return end   -- static backdrop: draw it just once
+  ready = 1
+  cls(1)                              -- dark-blue background
+  print("hello from neslua", 60, 176, 7)
 end
 ```
+
+> The NES has no framebuffer, so `_draw` writes background tiles through a queue
+> that drains ~16 tiles/frame - re-queuing an unchanged screen every frame would
+> saturate it. Draw static content once (the guard above); update only what
+> changes. See [docs/DIFFERENCES.md](docs/DIFFERENCES.md).
 
 Build it and play it in a window:
 
@@ -40,7 +47,7 @@ npx neslua run examples/hello/main.lua
 ```
 
 <p align="center">
-  <img src="examples/hello/screenshot.png" width="480" alt="hello from neslua: a white smiley on a dark blue NES screen">
+  <img src="https://raw.githubusercontent.com/monteslu/neslua/main/examples/hello/screenshot.png" width="480" alt="hello from neslua: a white smiley on a dark blue NES screen">
 </p>
 
 Or build the cartridge - a byte-for-byte `.nes` that runs on any emulator or real
