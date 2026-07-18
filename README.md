@@ -10,35 +10,43 @@ Genesis, NES, C64), sharing one statically-typed Lua-to-C front-end.
 
 ## Your first game
 
-A complete NES game - one `main.lua`. `_init` runs once at boot, `_draw` every
-frame (see `examples/hello/main.lua`):
+A complete NES game - one `main.lua`: a hardware sprite you move with the
+d-pad, plus a greeting. Here's the core loop; `examples/hello/main.lua` builds
+on it with a whole swarm of bouncing sprites (the screenshot below).
+`_update60` runs the movement 60 times a second; `_draw` redraws the sprite
+every frame:
 
 ```lua
 local ready = 0
+local x = 120
+local y = 112
 
-function _init()
-  -- one-time setup: open a 48x48 pixel canvas and paint the smiley into its
-  -- buffer once (the canvas then auto-uploads a tile per frame - see below).
-  nes.canvas_at(6, 6, 13, 9)
-  circfill(24, 24, 22, 1)      -- filled face
-  circfill(15, 19, 4, 0)       -- left eye (cut out)
-  circfill(33, 19, 4, 0)       -- right eye
-  circfill(24, 27, 13, 0)      -- carve a grin...
-  circfill(24, 21, 14, 1)      -- ...leaving a crescent smile
+function _update60()               -- 60fps input + movement
+  if (btn(1)) then x += 2 end      -- right
+  if (btn(0)) then x -= 2 end      -- left
+  if (btn(3)) then y += 2 end      -- down
+  if (btn(2)) then y -= 2 end      -- up
+  x = mid(8, x, 240)               -- clamp to the visible playfield
+  y = mid(16, y, 208)
 end
 
-function _draw()               -- runs every frame
-  if (ready == 1) then return end   -- static backdrop: draw it just once
-  ready = 1
-  cls(1)                              -- dark-blue background
-  print("hello from neslua", 60, 176, 7)
+function _draw()
+  if (ready == 0) then             -- static backdrop + greeting: draw once
+    cls(12)                        -- sky-blue backdrop
+    print("hello neslua", 72, 32, 7)
+    ready = 1
+  end
+  spr(1, x, y)                     -- the hardware sprite, redrawn every frame
 end
 ```
 
-> The NES has no framebuffer, so `_draw` writes background tiles through a queue
-> that drains ~16 tiles/frame - re-queuing an unchanged screen every frame would
-> saturate it. Draw static content once (the guard above); update only what
-> changes. See [docs/DIFFERENCES.md](docs/DIFFERENCES.md).
+> The NES is a tile+sprite machine. The square is a real hardware sprite -
+> `spr(1, x, y)` pushes the built-in solid-block tile into shadow OAM, DMA'd to
+> the PPU every frame, so it moves freely and costs nothing to redraw. The
+> greeting is background tiles written through a queue that drains ~16
+> tiles/frame, so we lay it down once (the guard) and never repaint it. That
+> split - cheap sprites, static background - is how the NES actually animates.
+> See [docs/DIFFERENCES.md](docs/DIFFERENCES.md).
 
 Build it and play it in a window:
 
@@ -47,7 +55,7 @@ npx neslua run examples/hello/main.lua
 ```
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/monteslu/neslua/main/examples/hello/screenshot.png" width="480" alt="hello from neslua: a white smiley on a dark blue NES screen">
+  <img src="https://raw.githubusercontent.com/monteslu/neslua/main/examples/hello/screenshot.png" width="480" alt="hello neslua: a player block and a swarm of bouncing ball and diamond hardware sprites under 'hello neslua' text on a sky-blue NES screen">
 </p>
 
 Or build the cartridge - a byte-for-byte `.nes` that runs on any emulator or real
