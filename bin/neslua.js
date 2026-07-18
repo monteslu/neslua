@@ -164,18 +164,18 @@ const flagVal = (name) => { const i = rest.indexOf(name); return i !== -1 ? rest
 const entryArg = () => rest.find((a) => !a.startsWith("-") && (a === rest[0] || rest[rest.indexOf(a) - 1]?.startsWith("-") === false || !rest[rest.indexOf(a) - 1]?.startsWith("-")));
 
 if (cmd === "build") {
-  const entry = rest.filter((a, i) => !a.startsWith("-") && rest[i - 1] !== "-o")[0];
-  if (!entry) fail("usage: neslua build <main.lua> [-o game.nes]");
-  await runBuild(entry, { outPath: flagVal("-o") });
+  const entry = rest.filter((a, i) => !a.startsWith("-") && rest[i - 1] !== "-o" && rest[i - 1] !== "--sheet")[0];
+  if (!entry) fail("usage: neslua build <main.lua> [-o game.nes] [--sheet sheet.chr|sheet.png]");
+  await runBuild(entry, { outPath: flagVal("-o"), sheetPath: flagVal("--sheet") });
   if (_closeWorker) _closeWorker();
 } else if (cmd === "run") {
-  const entry = rest.filter((a, i) => !a.startsWith("-") && rest[i - 1] !== "-o")[0];
-  if (!entry) fail("usage: neslua run <main.lua|game.nes>");
+  const entry = rest.filter((a, i) => !a.startsWith("-") && rest[i - 1] !== "-o" && rest[i - 1] !== "--sheet")[0];
+  if (!entry) fail("usage: neslua run <main.lua|game.nes> [--sheet sheet.chr|sheet.png]");
   let rom;
   if (entry.endsWith(".nes")) rom = entry;
   else {
     rom = path.join(path.dirname(path.resolve(entry)), path.basename(entry, path.extname(entry)) + ".nes");
-    await runBuild(entry, { outPath: rom });
+    await runBuild(entry, { outPath: rom, sheetPath: flagVal("--sheet") });
     if (_closeWorker) _closeWorker();
   }
   try {

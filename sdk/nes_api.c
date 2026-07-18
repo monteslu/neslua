@@ -498,14 +498,19 @@ static void oam_push(u8 x, u8 y, u8 tile, u8 attr) {
     ++oam_next;
 }
 
+/* current sprite sub-palette (0-3), selected by nes_spal(). spr() ORs it into
+ * the OAM attribute byte so different actors can use different colors. */
+static u8 spr_pal;
+void nes_spal(int p) { spr_pal = (u8)(p & 3); }
+
 /* spr(n, x, y, w, h, flip): n = base sprite tile ($00 pattern table). w/h are
- * cell counts. flip bit0 = X, bit1 = Y. Sprite palette 0. */
+ * cell counts. flip bit0 = X, bit1 = Y. Uses the current nes_spal() palette. */
 void nes_spr(int n, int x, int y, int w, int h, int flip) {
     u8 tx, ty, attr;
     int px, py;
     if (w < 1) w = 1;
     if (h < 1) h = 1;
-    attr = 0;
+    attr = spr_pal;
     if (flip & 1) attr |= 0x40;
     if (flip & 2) attr |= 0x80;
     x -= nes_cam_x; y -= nes_cam_y;
@@ -604,10 +609,10 @@ static const u8 default_palette[32] = {
     0x0F, 0x27, 0x16, 0x06,   /* BG1: orange ramp (canvas) */
     0x0F, 0x2A, 0x1A, 0x0A,   /* BG2: green ramp */
     0x0F, 0x30, 0x10, 0x00,   /* BG3: grey ramp */
-    0x0F, 0x30, 0x27, 0x16,   /* SPR0: white/orange (smiley) */
-    0x0F, 0x30, 0x2A, 0x1A,   /* SPR1 */
-    0x0F, 0x30, 0x21, 0x11,   /* SPR2 */
-    0x0F, 0x30, 0x16, 0x06,   /* SPR3 */
+    0x0F, 0x16, 0x30, 0x27,   /* SPR0: red/white/orange (invader) */
+    0x0F, 0x21, 0x30, 0x11,   /* SPR1: cyan/white/blue (ship) */
+    0x0F, 0x2A, 0x3A, 0x30,   /* SPR2: green/lt-green/white (shot) */
+    0x0F, 0x28, 0x17, 0x30,   /* SPR3: yellow/orange/white (burst) */
 };
 
 static void palette_load(const u8 *p) {
@@ -625,8 +630,21 @@ static const u8 default_sprites[3][8] = {
     { 0x3C,0x7E,0xFF,0xFF,0xFF,0xFF,0x7E,0x3C },   /* tile 2: filled ball */
     { 0x18,0x3C,0x7E,0xFF,0xFF,0x7E,0x3C,0x18 },   /* tile 3: diamond */
 };
+/* An imported sprite sheet (--sheet): raw CHR bytes emitted as a C unit by the
+ * build. nes_sheet_len == 0 on a bare cart, in which case we upload the three
+ * built-in default tiles instead. */
+extern const unsigned char nes_sheet_data[];
+extern const unsigned int nes_sheet_len;
+
 static void sprite_tiles_upload(void) {
     u8 t, r;
+    if (nes_sheet_len != 0) {
+        /* upload the imported sheet starting at sprite tile 0 ($0000). */
+        u16 i;
+        vram_addr(0x0000);
+        for (i = 0; i < nes_sheet_len; ++i) vram_put(nes_sheet_data[i]);
+        return;
+    }
     for (t = 0; t < 3; ++t) {
         vram_addr(0x0000 + (u16)(t + 1) * 16);
         for (r = 0; r < 8; ++r) vram_put(default_sprites[t][r]);   /* plane 0 */

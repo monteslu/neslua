@@ -25,11 +25,23 @@ reports any tile that needed more colors than fit.
 
 ### Raw CHR
 
-A raw 4 KB or 8 KB `.chr` blob is accepted as-is (no conversion):
+`--sheet` accepts a raw `.chr` blob (used as-is) **or** a `.png` (quantized at
+build time by the same encoder). The bytes are uploaded to the sprite pattern
+table at boot, replacing the three default tiles:
 
 ```
-neslua build main.lua --sheet sheet.chr -o game.nes
+neslua build main.lua --sheet sheet.chr -o game.nes   # raw CHR
+neslua build main.lua --sheet sheet.png -o game.nes   # PNG, quantized in-build
 ```
+
+### Sprite sub-palettes
+
+Each 8x8 tile is 3 colors + transparent. The NES has **four** sprite
+sub-palettes; `nes.spal(0..3)` selects which one the following `spr()` calls
+use, so different actors can wear different colors in the same frame (see
+[`examples/starfall`](../examples/starfall): red invaders, a cyan ship, green
+shots, a yellow burst). The default palettes are a warm/cool actor set; a
+palette-set API is a later milestone.
 
 ## Color-count reality
 

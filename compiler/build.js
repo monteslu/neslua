@@ -12,6 +12,37 @@
 
 import { compile, formatDiagnostics } from "./index.js";
 import { peephole } from "./peephole.js";
+import { pngToChr } from "./chr-encode.mjs";
+
+// Turn a sprite sheet (raw .chr or a .png) into the CHR bytes the runtime
+// uploads to the sprite pattern table at boot. A .png is quantized per-tile to
+// one NES sub-palette (3 colors + transparent) by the shared CHR encoder.
+function loadSheetChr(env, sheetPath) {
+  const bytes = env.readFile(sheetPath);
+  const buf = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  if (sheetPath.toLowerCase().endsWith(".png")) {
+    const { chr, warnings } = pngToChr(buf);
+    for (const w of warnings) env.warn("sheet: " + w);
+    return chr;
+  }
+  return buf;   // raw .chr
+}
+
+// Emit the C unit that carries the sheet CHR (or an empty sheet for a bare
+// cart, so the unit always links and the runtime falls back to its defaults).
+function emitSheetC(chr) {
+  if (!chr || chr.length === 0) {
+    return "const unsigned int nes_sheet_len = 0;\n" +
+           "const unsigned char nes_sheet_data[1] = {0};\n";
+  }
+  let body = "";
+  for (let i = 0; i < chr.length; i++) {
+    body += chr[i] + ",";
+    if ((i & 15) === 15) body += "\n";
+  }
+  return `const unsigned int nes_sheet_len = ${chr.length}u;\n` +
+         `const unsigned char nes_sheet_data[${chr.length}] = {\n${body}};\n`;
+}
 
 // run one tool; throw on nonzero status with the tool log.
 function run(env, tool, args) {
@@ -49,6 +80,12 @@ export async function build(entry, opts, env) {
   const gameC = B("main.c");
   env.writeFile(gameC, result.c);
 
+  // sprite sheet -> CHR -> a C data unit the runtime uploads at boot. Always
+  // emitted (empty when no --sheet) so the link set is stable.
+  const sheetChr = opts.sheetPath ? loadSheetChr(env, opts.sheetPath) : null;
+  const sheetC = B("sheet.c");
+  env.writeFile(sheetC, emitSheetC(sheetChr));
+
   // cc65 flags: NES 2A03 is a plain NMOS 6502. -Osr optimizes; --static-locals
   // makes locals absolute stores (the 6502 has no cheap stack-relative access);
   // -g keeps symbols for the debug map; -I SDK finds nes_api.h.
@@ -73,6 +110,10 @@ export async function build(entry, opts, env) {
   cc(gameC, B("main.s"));
   as(B("main.s"), B("main.o"));
 
+  // 2a. the sprite-sheet data unit
+  cc(sheetC, B("sheet.s"));
+  as(B("sheet.s"), B("sheet.o"));
+
   // 2b. the C runtime units
   ccAs("nes_api.c", "nes_api");
   ccAs("nes_fixed.c", "nes_fixed");
@@ -86,7 +127,7 @@ export async function build(entry, opts, env) {
 
   // 4. link. The crt0 is the startup module; nes.lib supplies the C runtime
   // (zerobss/copydata/incsp/mul/div helpers). neslua.cfg places PRG-RAM BSS.
-  const objs = ["crt0.o", "main.o", "nes_api.o", "nes_fixed.o", "nes_math.o", "nes_fixed_asm.o", "nes_rng.o"].map(B);
+  const objs = ["crt0.o", "main.o", "sheet.o", "nes_api.o", "nes_fixed.o", "nes_math.o", "nes_fixed_asm.o", "nes_rng.o"].map(B);
   const cfg = env.join(SDK, "neslua.cfg");
   const dbg = B(`${name}.dbg`);
   run(env, "ld65", ["-C", cfg, "-o", nes, "--dbgfile", dbg, ...objs, env.lib]);

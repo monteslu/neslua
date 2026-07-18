@@ -8,6 +8,19 @@ either - the cc65 toolchain runs as bundled WebAssembly. neslua is the NES membe
 of the [luacretro](https://github.com/monteslu) console SDK family (GameTank, GBA,
 Genesis, NES, C64), sharing one statically-typed Lua-to-C front-end.
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/monteslu/neslua/main/examples/starfall/screenshot.png" width="480" alt="starfall: a complete NES shmup - a staggered formation of red invaders, a cyan player ship firing a green bolt, over a starfield with a score/lives HUD">
+</p>
+
+That is [`examples/starfall`](examples/starfall) - a complete shmup in ~200
+lines of Lua: a staggered invader formation (all 12 on-screen within the NES's
+8-sprites-per-scanline limit), a ship you fly and fire, collisions, score/lives,
+and a background-tile starfield. Build and play it:
+
+```sh
+npx neslua run examples/starfall/main.lua --sheet examples/starfall/shmup_sheet.chr
+```
+
 ## Your first game
 
 A complete NES game - one `main.lua`: a hardware sprite you move with the
@@ -102,6 +115,9 @@ visible. Coordinate space is 256 x 240. Full details in
 
 Each builds to a `.nes` and runs on the emulator (real captured frames below):
 
+- [`starfall`](examples/starfall) - a complete shmup: staggered invaders, a
+  ship that flies and fires, collisions, score/lives, a starfield (the hero
+  image above). Shows the sprite-budget discipline the NES demands.
 - [`hello`](examples/hello) - a smiley + centered text (the family hello).
 - [`pad-square`](examples/pad-square) - move a sprite with the d-pad.
 - [`mathcheck`](examples/mathcheck) - the 16.16 fixed-point conformance cart.

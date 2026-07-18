@@ -92,6 +92,7 @@ void nes_map(const u8 *m, int w, int cx, int cy, int sx, int sy, int cw, int ch)
 /* spr(n,x,y,[w,h,fx,fy]): push 8x8 sprite tiles onto the shadow OAM. w/h are
  * cell counts (1 = 8px). The zp entry reads nes_a0..a5 (flips packed in a5). */
 void nes_spr(int n, int x, int y, int w, int h, int flip);
+void nes_spal(int p);                         /* select sprite sub-palette 0-3 for spr() */
 void nes_spr_z(void);
 void nes_flicker(int on);                     /* OAM rotation for >8/scanline crowds */
 

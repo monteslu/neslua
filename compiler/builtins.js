@@ -99,6 +99,8 @@ export const GT_MEMBERS = {
   tpal:    { kind: "fn", params: [["int", false], ["int", false], ["int", false]], ret: "void", c: "lc_tpal" },
   // OAM rotation so >8-per-scanline crowds shimmer instead of vanish.
   flicker: { kind: "fn", params: [["flip", false]], ret: "void", c: "lc_flicker" },
+  // select the sprite sub-palette (0-3) that subsequent spr() calls use.
+  spal:    { kind: "fn", params: [["int", false]], ret: "void", c: "lc_spal" },
   // backdrop / overscan color, and frames-since-boot.
   border:  { kind: "fn", params: [["color", false]], ret: "void", c: "lc_border" },
   ticks:   { kind: "fn", params: [], ret: "int", c: "nes_ticks", isValue: false },
