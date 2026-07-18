@@ -122,9 +122,11 @@ Each builds to a `.nes` and runs on the emulator (real captured frames below):
 
 [Node.js](https://nodejs.org/) **24+**, and nothing else. `npm install` pulls in
 `luacretro` (the shared front-end), `romdev-toolchain-cc65` (the cc65 toolchain
-as WebAssembly), and `romdev-core-fceumm` (the emulator core for `neslua run`,
-which also needs the optional `@kmamal/sdl` for the window). No native compiler
-or emulator to install.
+as WebAssembly), `romdev-core-fceumm` (the emulator core), and
+`romdev-core-runner` (the shared SDL host that `neslua run` opens a window
+through - the same one the whole SDK family and the romdev playtest tool use).
+The window needs `@kmamal/sdl`, an *optional* dependency of the runner. No
+native compiler or emulator to install.
 
 ## License
 
