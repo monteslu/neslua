@@ -16,8 +16,6 @@ function _update60()             -- 60fps: read the d-pad, move the ship
   if (btn(0)) then x -= 2 end    -- left
   if (btn(3)) then y += 2 end    -- down
   if (btn(2)) then y -= 2 end    -- up
-  x = mid(8, x, 232)             -- stay on screen
-  y = mid(16, y, 200)
 end
 
 function _draw()                 -- runs every frame

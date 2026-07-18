@@ -22,8 +22,6 @@ static void lcl__update60(void)
     if (((nes_pad0 & 2056u) != 0)) {
         lcl_y = (lcl_y - 2);
     }
-    lcl_x = ((8 < lcl_x) ? ((lcl_x < 232) ? (lcl_x) : (((unsigned char)8 < (unsigned char)232) ? (232) : (8))) : (((unsigned char)8 < (unsigned char)232) ? (8) : ((lcl_x < 232) ? (232) : (lcl_x))));
-    lcl_y = ((16 < lcl_y) ? ((lcl_y < 200) ? (lcl_y) : (((unsigned char)16 < (unsigned char)200) ? (200) : (16))) : (((unsigned char)16 < (unsigned char)200) ? (16) : ((lcl_y < 200) ? (200) : (lcl_y))));
 }
 
 static void lcl__draw(void)
