@@ -2,54 +2,54 @@
 #include "nes_api.h"
 #include "nes_math.h"
 
-static void gtl__init(void);
-static void gtl__update(void);
-static void gtl__draw(void);
+static void lcl__init(void);
+static void lcl__update(void);
+static void lcl__draw(void);
 
-long gtl_r_add = 0L; /* 0 */
-long gtl_r_mul = 0L; /* 0 */
-long gtl_r_div = 0L; /* 0 */
-int gtl_r_flrdiv = 0;
-int gtl_r_mod = 0;
-long gtl_r_sqrt = 0L; /* 0 */
-long gtl_r_sin = 0L; /* 0 */
-long gtl_r_cos = 0L; /* 0 */
-long gtl_r_abs = 0L; /* 0 */
-int gtl_r_min = 0;
-int gtl_r_max = 0;
-int gtl_r_flr = 0;
-int gtl_shown = 0;
+long lcl_r_add = 0L; /* 0 */
+long lcl_r_mul = 0L; /* 0 */
+long lcl_r_div = 0L; /* 0 */
+int lcl_r_flrdiv = 0;
+int lcl_r_mod = 0;
+long lcl_r_sqrt = 0L; /* 0 */
+long lcl_r_sin = 0L; /* 0 */
+long lcl_r_cos = 0L; /* 0 */
+long lcl_r_abs = 0L; /* 0 */
+int lcl_r_min = 0;
+int lcl_r_max = 0;
+int lcl_r_flr = 0;
+int lcl_shown = 0;
 
-static void gtl__init(void)
+static void lcl__init(void)
 {
-    gtl_r_add = (98304L /* 1.5 */ + 147456L /* 2.25 */);
-    gtl_r_mul = ((131072L) + ((131072L) >> 1));
-    gtl_r_div = (196608L >> 1);
-    gtl_r_flrdiv = ((-9) >> 1);
-    gtl_r_mod = ((-9) & 1);
-    gtl_r_sqrt = nes_fsqrt(131072L);
-    gtl_r_sin = nes_fsin(16384L /* 0.25 */);
-    gtl_r_cos = nes_fcos(32768L /* 0.5 */);
-    gtl_r_abs = nes_absf((-229376L /* 3.5 */));
-    gtl_r_min = (((unsigned char)4 < (unsigned char)7) ? (4) : (7));
-    gtl_r_max = (((unsigned char)4 > (unsigned char)7) ? (4) : (7));
-    gtl_r_flr = (int)(245760L /* 3.75 */ >> 16);
+    lcl_r_add = (98304L /* 1.5 */ + 147456L /* 2.25 */);
+    lcl_r_mul = ((131072L) + ((131072L) >> 1));
+    lcl_r_div = (196608L >> 1);
+    lcl_r_flrdiv = ((-9) >> 1);
+    lcl_r_mod = ((-9) & 1);
+    lcl_r_sqrt = nes_fsqrt(131072L);
+    lcl_r_sin = nes_fsin(16384L /* 0.25 */);
+    lcl_r_cos = nes_fcos(32768L /* 0.5 */);
+    lcl_r_abs = nes_absf((-229376L /* 3.5 */));
+    lcl_r_min = (((unsigned char)4 < (unsigned char)7) ? (4) : (7));
+    lcl_r_max = (((unsigned char)4 > (unsigned char)7) ? (4) : (7));
+    lcl_r_flr = (int)(245760L /* 3.75 */ >> 16);
 }
 
-static void gtl__update(void)
+static void lcl__update(void)
 {
 }
 
-static void gtl__draw(void)
+static void lcl__draw(void)
 {
-    if ((gtl_shown == 0)) {
+    if ((lcl_shown == 0)) {
         nes_cls(15);
         nes_print("mathcheck", 88, 24, 48);
-        nes_print_int((int)(gtl_r_add >> 16), 40, 56, 48);
-        nes_print_int(gtl_r_flrdiv, 40, 72, 48);
-        nes_print_int(gtl_r_min, 40, 88, 48);
-        nes_print_int(gtl_r_max, 40, 104, 48);
-        gtl_shown = 1;
+        nes_print_int((int)(lcl_r_add >> 16), 40, 56, 48);
+        nes_print_int(lcl_r_flrdiv, 40, 72, 48);
+        nes_print_int(lcl_r_min, 40, 88, 48);
+        nes_print_int(lcl_r_max, 40, 104, 48);
+        lcl_shown = 1;
     }
 }
 
@@ -57,15 +57,15 @@ void main(void)
 {
     unsigned char _nes_odd = 0;
     nes_init();
-    gtl__init();
+    lcl__init();
     for (;;) {
         nes_update_inputs();
         nes_oam_clear();
         if (_nes_odd == 0) {
-            gtl__update();
+            lcl__update();
         }
         _nes_odd ^= 1;
-        gtl__draw();
+        lcl__draw();
         nes_endframe();
     }
 }

@@ -2,19 +2,19 @@
 #include "nes_api.h"
 #include "nes_math.h"
 
-static void gtl__update(void);
-static void gtl__draw(void);
+static void lcl__update(void);
+static void lcl__draw(void);
 
-long gtl_x = 0L; /* 0 */
+long lcl_x = 0L; /* 0 */
 
-static void gtl__update(void)
+static void lcl__update(void)
 {
-    gtl_x = (gtl_x + 32768L /* 0.5 */);
-    gtl_x = (fa = gtl_x, fb = 196608L, nes_fdiv_zp());
-    gtl_x = (gtl_x & 131071L);
+    lcl_x = (lcl_x + 32768L /* 0.5 */);
+    lcl_x = (fa = lcl_x, fb = 196608L, nes_fdiv_zp());
+    lcl_x = (lcl_x & 131071L);
 }
 
-static void gtl__draw(void)
+static void lcl__draw(void)
 {
 }
 
@@ -26,10 +26,10 @@ void main(void)
         nes_update_inputs();
         nes_oam_clear();
         if (_nes_odd == 0) {
-            gtl__update();
+            lcl__update();
         }
         _nes_odd ^= 1;
-        gtl__draw();
+        lcl__draw();
         nes_endframe();
     }
 }

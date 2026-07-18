@@ -2,22 +2,22 @@
 #include "nes_api.h"
 #include "nes_math.h"
 
-static int gtl_helper(void);
-static void gtl__update(void);
-static void gtl__draw(void);
+static int lcl_helper(void);
+static void lcl__update(void);
+static void lcl__draw(void);
 
-static int gtl_helper(void)
+static int lcl_helper(void)
 {
     return (nes_p0 + nes_p1);
 }
 
-static void gtl__update(void)
+static void lcl__update(void)
 {
-    { int gtl_z = (((1) + (2)));
+    { int lcl_z = (((1) + (2)));
     }
 }
 
-static void gtl__draw(void)
+static void lcl__draw(void)
 {
 }
 
@@ -29,10 +29,10 @@ void main(void)
         nes_update_inputs();
         nes_oam_clear();
         if (_nes_odd == 0) {
-            gtl__update();
+            lcl__update();
         }
         _nes_odd ^= 1;
-        gtl__draw();
+        lcl__draw();
         nes_endframe();
     }
 }

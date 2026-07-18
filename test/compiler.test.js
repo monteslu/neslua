@@ -40,7 +40,7 @@ test("the NES harness stages sprites then waits (loop-order baked in)", () => {
   assert.match(c, /nes_endframe\(\);/);
   // oam_clear must precede the draw callback, endframe after (stage-then-wait)
   const iClear = c.indexOf("nes_oam_clear();");
-  const iDraw = c.indexOf("gtl__draw();");
+  const iDraw = c.indexOf("lcl__draw();");
   const iEnd = c.indexOf("nes_endframe();");
   assert.ok(iClear < iDraw && iDraw < iEnd, "order: oam_clear -> _draw -> endframe");
 });

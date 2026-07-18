@@ -1,7 +1,7 @@
 // builtins.js - the neslua PICO-8 API surface for the NES.
 //
-// The C symbol names use the shared gt_* schema; luacretro's cName final pass
-// collapses gt_p8_* / gt_* to nes_* for this target (so gt_p8_cls -> nes_cls).
+// The C symbol names use the shared lc_* schema; luacretro's cName final pass
+// collapses lc_* to nes_* for this target (so lc_cls -> nes_cls).
 //
 // The NES has NO framebuffer, so the surface model differs from the framebuffer
 // SDKs (see docs/DIFFERENCES.md):
@@ -16,9 +16,9 @@
 
 export const BUILTINS = {
   // ---- background surface ---------------------------------------------------
-  cls:      { params: [["color", true]], ret: "void", c: "gt_p8_cls" },
-  camera:   { params: [["coord", true], ["coord", true]], ret: "void", c: "gt_p8_camera" },
-  color:    { params: [["color", false]], ret: "void", c: "gt_p8_color" },
+  cls:      { params: [["color", true]], ret: "void", c: "lc_cls" },
+  camera:   { params: [["coord", true], ["coord", true]], ret: "void", c: "lc_camera" },
+  color:    { params: [["color", false]], ret: "void", c: "lc_color" },
   // print(v [,x,y] [,c]): baked 1bpp font -> nametable tiles (32x28 text cells).
   print:    { params: [], ret: "int", special: "print" },
   // map(cx,cy,sx,sy,cw,ch): stamp tiles from the imported __map__ (128 wide).
@@ -27,27 +27,27 @@ export const BUILTINS = {
 
   // ---- sprite surface -------------------------------------------------------
   // spr(n,x,y,[w,h,fx,fy]): 8x8 sprite tiles onto the shadow OAM. w/h = cells.
-  spr:      { params: [["int", false], ["coord", false], ["coord", false], ["int", true], ["int", true], ["flip", true], ["flip", true]], ret: "void", c: "gt_p8_spr" },
+  spr:      { params: [["int", false], ["coord", false], ["coord", false], ["int", true], ["int", true], ["flip", true], ["flip", true]], ret: "void", c: "lc_spr" },
 
   // ---- pixel canvas (surface 3) ---------------------------------------------
   // These paint the active pixel canvas (nes.canvas) or, inside nes.blank, the
   // whole background. On a bare cart with no canvas they no-op (documented).
-  pset:     { params: [["coord", false], ["coord", false], ["color", true]], ret: "void", c: "gt_p8_pset" },
-  pget:     { params: [["coord", false], ["coord", false]], ret: "int", c: "gt_p8_pget" },
-  sset:     { params: [["coord", false], ["coord", false], ["color", true]], ret: "void", c: "gt_p8_sset" },
-  rect:     { params: [["coord", false], ["coord", false], ["coord", false], ["coord", false], ["color", true]], ret: "void", c: "gt_p8_rect" },
-  rectfill: { params: [["coord", false], ["coord", false], ["coord", false], ["coord", false], ["color", true]], ret: "void", c: "gt_p8_rectfill" },
-  circ:     { params: [["coord", false], ["coord", false], ["coord", false], ["color", true]], ret: "void", c: "gt_p8_circ" },
-  circfill: { params: [["coord", false], ["coord", false], ["coord", false], ["color", true]], ret: "void", c: "gt_p8_circfill" },
-  line:     { params: [["coord", false], ["coord", false], ["coord", false], ["coord", false], ["color", true]], ret: "void", c: "gt_p8_line" },
+  pset:     { params: [["coord", false], ["coord", false], ["color", true]], ret: "void", c: "lc_pset" },
+  pget:     { params: [["coord", false], ["coord", false]], ret: "int", c: "lc_pget" },
+  sset:     { params: [["coord", false], ["coord", false], ["color", true]], ret: "void", c: "lc_sset" },
+  rect:     { params: [["coord", false], ["coord", false], ["coord", false], ["coord", false], ["color", true]], ret: "void", c: "lc_rect" },
+  rectfill: { params: [["coord", false], ["coord", false], ["coord", false], ["coord", false], ["color", true]], ret: "void", c: "lc_rectfill" },
+  circ:     { params: [["coord", false], ["coord", false], ["coord", false], ["color", true]], ret: "void", c: "lc_circ" },
+  circfill: { params: [["coord", false], ["coord", false], ["coord", false], ["color", true]], ret: "void", c: "lc_circfill" },
+  line:     { params: [["coord", false], ["coord", false], ["coord", false], ["coord", false], ["color", true]], ret: "void", c: "lc_line" },
 
   // ---- input ----------------------------------------------------------------
   // 0=left 1=right 2=up 3=down 4=O(NES B) 5=X(NES A) 6=select 7=start
-  btn:      { params: [["int", false], ["int", true]], ret: "bool", c: "gt_p8_btn" },
-  btnp:     { params: [["int", false], ["int", true]], ret: "bool", c: "gt_p8_btnp" },
+  btn:      { params: [["int", false], ["int", true]], ret: "bool", c: "lc_btn" },
+  btnp:     { params: [["int", false], ["int", true]], ret: "bool", c: "lc_btnp" },
 
   // ---- sound (APU; sfx v1) --------------------------------------------------
-  sfx:      { params: [["int", false], ["int", true]], ret: "void", c: "gt_sfx", audio: true },
+  sfx:      { params: [["int", false], ["int", true]], ret: "void", c: "lc_sfx", audio: true },
 
   // ---- math -----------------------------------------------------------------
   flr:   { params: [["num", false]], ret: "int", c: null, special: "flr" },
@@ -57,10 +57,10 @@ export const BUILTINS = {
   min:   { params: [["num", false], ["num", true]], ret: "same", c: null, special: "min" },
   max:   { params: [["num", false], ["num", true]], ret: "same", c: null, special: "max" },
   mid:   { params: [["num", false], ["num", false], ["num", false]], ret: "same", c: null, special: "mid" },
-  sqrt:  { params: [["num", false]], ret: "fixed", c: "gt_fsqrt" },
-  sin:   { params: [["num", false]], ret: "fixed", c: "gt_fsin" },
-  cos:   { params: [["num", false]], ret: "fixed", c: "gt_fcos" },
-  atan2: { params: [["num", false], ["num", false]], ret: "fixed", c: "gt_fatan2" },
+  sqrt:  { params: [["num", false]], ret: "fixed", c: "lc_fsqrt" },
+  sin:   { params: [["num", false]], ret: "fixed", c: "lc_fsin" },
+  cos:   { params: [["num", false]], ret: "fixed", c: "lc_fcos" },
+  atan2: { params: [["num", false], ["num", false]], ret: "fixed", c: "lc_fatan2" },
 
   band:  { params: [["num", false], ["num", false]], ret: "same", c: null, special: "bitop", op: "&" },
   bor:   { params: [["num", false], ["num", false]], ret: "same", c: null, special: "bitop", op: "|" },
@@ -69,10 +69,10 @@ export const BUILTINS = {
   shl:   { params: [["num", false], ["num", false]], ret: "same", c: null, special: "bitop", op: "<<" },
   shr:   { params: [["num", false], ["num", false]], ret: "same", c: null, special: "bitop", op: ">>" },
   lshr:  { params: [["num", false], ["num", false]], ret: "same", c: null, special: "bitop", op: ">>>" },
-  rnd:   { params: [["num", true]], ret: "fixed", c: "gt_p8_rnd" },
-  srand: { params: [["num", false]], ret: "void", c: "gt_p8_srand" },
-  t:     { params: [], ret: "fixed", c: "gt_p8_time" },
-  time:  { params: [], ret: "fixed", c: "gt_p8_time" },
+  rnd:   { params: [["num", true]], ret: "fixed", c: "lc_rnd" },
+  srand: { params: [["num", false]], ret: "void", c: "lc_srand" },
+  t:     { params: [], ret: "fixed", c: "lc_time" },
+  time:  { params: [], ret: "fixed", c: "lc_time" },
 
   // fixed-capacity static allocations (land in the 8KB PRG-RAM at $6000).
   array:  { params: [["int", false], ["num", true]], ret: "array", special: "array" },
@@ -88,19 +88,19 @@ export const GT_MEMBERS = {
   // nearest index for an RGB triple resolved at compile time.
   rgb:     { kind: "fn", params: [["int", false]], ret: "int", special: "rgb" },
   // reserve/place the pixel canvas (a CHR-RAM window; cap 32 tiles).
-  canvas:  { kind: "fn", params: [["int", false], ["int", false]], ret: "void", c: "gt_canvas" },
-  canvas_at: { kind: "fn", params: [["int", false], ["int", false], ["int", false], ["int", false]], ret: "void", c: "gt_canvas_at" },
-  canvas_clear: { kind: "fn", params: [], ret: "void", c: "gt_canvas_clear" },
-  canvas_show:  { kind: "fn", params: [], ret: "void", c: "gt_canvas_show" },
+  canvas:  { kind: "fn", params: [["int", false], ["int", false]], ret: "void", c: "lc_canvas" },
+  canvas_at: { kind: "fn", params: [["int", false], ["int", false], ["int", false], ["int", false]], ret: "void", c: "lc_canvas_at" },
+  canvas_clear: { kind: "fn", params: [], ret: "void", c: "lc_canvas_clear" },
+  canvas_show:  { kind: "fn", params: [], ret: "void", c: "lc_canvas_show" },
   // blank-mode escape hatch: force rendering off for the full drawing verb set.
-  blank:   { kind: "fn", params: [["flip", false]], ret: "void", c: "gt_blank" },
+  blank:   { kind: "fn", params: [["flip", false]], ret: "void", c: "lc_blank" },
   // write a single nametable tile / attribute (16x16) palette.
-  tset:    { kind: "fn", params: [["int", false], ["int", false], ["int", false]], ret: "void", c: "gt_tset" },
-  tpal:    { kind: "fn", params: [["int", false], ["int", false], ["int", false]], ret: "void", c: "gt_tpal" },
+  tset:    { kind: "fn", params: [["int", false], ["int", false], ["int", false]], ret: "void", c: "lc_tset" },
+  tpal:    { kind: "fn", params: [["int", false], ["int", false], ["int", false]], ret: "void", c: "lc_tpal" },
   // OAM rotation so >8-per-scanline crowds shimmer instead of vanish.
-  flicker: { kind: "fn", params: [["flip", false]], ret: "void", c: "gt_flicker" },
+  flicker: { kind: "fn", params: [["flip", false]], ret: "void", c: "lc_flicker" },
   // backdrop / overscan color, and frames-since-boot.
-  border:  { kind: "fn", params: [["color", false]], ret: "void", c: "gt_p8_border" },
+  border:  { kind: "fn", params: [["color", false]], ret: "void", c: "lc_border" },
   ticks:   { kind: "fn", params: [], ret: "int", c: "nes_ticks", isValue: false },
 };
 

@@ -2,10 +2,10 @@
 #include "nes_api.h"
 #include "nes_math.h"
 
-static void gtl__update(void);
-static void gtl__draw(void);
+static void lcl__update(void);
+static void lcl__draw(void);
 
-static void gtl__update(void)
+static void lcl__update(void)
 {
     if (((nes_pad0 & 512u) != 0)) {
     }
@@ -13,7 +13,7 @@ static void gtl__update(void)
     }
 }
 
-static void gtl__draw(void)
+static void lcl__draw(void)
 {
 }
 
@@ -25,10 +25,10 @@ void main(void)
         nes_update_inputs();
         nes_oam_clear();
         if (_nes_odd == 0) {
-            gtl__update();
+            lcl__update();
         }
         _nes_odd ^= 1;
-        gtl__draw();
+        lcl__draw();
         nes_endframe();
     }
 }

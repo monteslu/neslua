@@ -2,12 +2,12 @@
 #include "nes_api.h"
 #include "nes_math.h"
 
-static void gtl__init(void);
-static void gtl__draw(void);
+static void lcl__init(void);
+static void lcl__draw(void);
 
-int gtl_ready = 0;
+int lcl_ready = 0;
 
-static void gtl__init(void)
+static void lcl__init(void)
 {
     nes_canvas_at(6, 6, 13, 9);
     (nes_a0 = 24, nes_a1 = 24, nes_a2 = 22, nes_a3 = 2, nes_circfill_z());
@@ -17,23 +17,23 @@ static void gtl__init(void)
     (nes_a0 = 24, nes_a1 = 21, nes_a2 = 14, nes_a3 = 2, nes_circfill_z());
 }
 
-static void gtl__draw(void)
+static void lcl__draw(void)
 {
-    if ((gtl_ready == 0)) {
+    if ((lcl_ready == 0)) {
         nes_cls(2);
         nes_print("hello from neslua", 60, 176, 48);
-        gtl_ready = 1;
+        lcl_ready = 1;
     }
 }
 
 void main(void)
 {
     nes_init();
-    gtl__init();
+    lcl__init();
     for (;;) {
         nes_update_inputs();
         nes_oam_clear();
-        gtl__draw();
+        lcl__draw();
         nes_endframe();
     }
 }

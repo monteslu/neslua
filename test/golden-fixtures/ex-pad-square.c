@@ -2,34 +2,34 @@
 #include "nes_api.h"
 #include "nes_math.h"
 
-static void gtl__update60(void);
-static void gtl__draw(void);
+static void lcl__update60(void);
+static void lcl__draw(void);
 
-int gtl_x = 120;
-int gtl_y = 112;
+int lcl_x = 120;
+int lcl_y = 112;
 
-static void gtl__update60(void)
+static void lcl__update60(void)
 {
     if (((nes_pad0 & 256u) != 0)) {
-        gtl_x = (gtl_x + 2);
+        lcl_x = (lcl_x + 2);
     }
     if (((nes_pad0 & 512u) != 0)) {
-        gtl_x = (gtl_x - 2);
+        lcl_x = (lcl_x - 2);
     }
     if (((nes_pad0 & 1028u) != 0)) {
-        gtl_y = (gtl_y + 2);
+        lcl_y = (lcl_y + 2);
     }
     if (((nes_pad0 & 2056u) != 0)) {
-        gtl_y = (gtl_y - 2);
+        lcl_y = (lcl_y - 2);
     }
-    gtl_x = ((8 < gtl_x) ? ((gtl_x < 240) ? (gtl_x) : (((unsigned char)8 < (unsigned char)240) ? (240) : (8))) : (((unsigned char)8 < (unsigned char)240) ? (8) : ((gtl_x < 240) ? (240) : (gtl_x))));
-    gtl_y = ((16 < gtl_y) ? ((gtl_y < 208) ? (gtl_y) : (((unsigned char)16 < (unsigned char)208) ? (208) : (16))) : (((unsigned char)16 < (unsigned char)208) ? (16) : ((gtl_y < 208) ? (208) : (gtl_y))));
+    lcl_x = ((8 < lcl_x) ? ((lcl_x < 240) ? (lcl_x) : (((unsigned char)8 < (unsigned char)240) ? (240) : (8))) : (((unsigned char)8 < (unsigned char)240) ? (8) : ((lcl_x < 240) ? (240) : (lcl_x))));
+    lcl_y = ((16 < lcl_y) ? ((lcl_y < 208) ? (lcl_y) : (((unsigned char)16 < (unsigned char)208) ? (208) : (16))) : (((unsigned char)16 < (unsigned char)208) ? (16) : ((lcl_y < 208) ? (208) : (lcl_y))));
 }
 
-static void gtl__draw(void)
+static void lcl__draw(void)
 {
     nes_cls(17);
-    (nes_a0 = 1, nes_a1 = gtl_x, nes_a2 = gtl_y, nes_a3 = 1, nes_a4 = 1, nes_a5 = 0 | (0 << 1), nes_spr_z());
+    (nes_a0 = 1, nes_a1 = lcl_x, nes_a2 = lcl_y, nes_a3 = 1, nes_a4 = 1, nes_a5 = 0 | (0 << 1), nes_spr_z());
 }
 
 void main(void)
@@ -38,8 +38,8 @@ void main(void)
     for (;;) {
         nes_update_inputs();
         nes_oam_clear();
-        gtl__update60();
-        gtl__draw();
+        lcl__update60();
+        lcl__draw();
         nes_endframe();
     }
 }
