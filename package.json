@@ -1,6 +1,6 @@
 {
   "name": "neslua",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "PICO-8-flavored Lua compiled to a real NES (.nes) ROM. Zero native tools: the cc65 toolchain runs as bundled WASM. The NES member of the luacretro console SDK family.",
   "type": "module",
   "license": "MIT",
@@ -13,6 +13,9 @@
   },
   "exports": {
     ".": "./compiler/index.js",
+    "./compiler/*": "./compiler/*",
+    "./build": "./compiler/build.js",
+    "./sdk/*": "./sdk/*",
     "./package.json": "./package.json"
   },
   "files": [

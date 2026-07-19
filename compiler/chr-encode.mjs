@@ -11,7 +11,6 @@
 // A 128x128 PNG = 256 8x8 tiles = exactly one NES pattern table (the PICO-8
 // sheet convention maps perfectly).
 
-import { readFileSync, writeFileSync } from "node:fs";
 import { decodePng } from "./png-decode.mjs";
 import { NES_MASTER, nearestNesIndex } from "./nes_palette.js";
 
@@ -65,9 +64,13 @@ export function pngToChr(pngBytes) {
   return { chr, tiles, cols, rows, warnings };
 }
 
-// CLI
-const args = process.argv.slice(2);
-if (import.meta.url === `file://${process.argv[1]}`) {
+// CLI. Everything node-only lives INSIDE this guard - `process` and node:fs
+// are both absent in a browser, and a top-level reference to either throws on
+// import. The IDEs import pngToChr() straight from this module, so the module
+// body must stay environment-agnostic.
+if (typeof process !== "undefined" && import.meta.url === `file://${process.argv[1]}`) {
+  const { readFileSync, writeFileSync } = await import("node:fs");
+  const args = process.argv.slice(2);
   const oIdx = args.indexOf("-o");
   const out = oIdx !== -1 ? args[oIdx + 1] : null;
   const input = args.find((a, i) => !a.startsWith("-") && args[i - 1] !== "-o");
