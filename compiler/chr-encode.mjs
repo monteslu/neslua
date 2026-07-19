@@ -68,8 +68,11 @@ export function pngToChr(pngBytes) {
 // are both absent in a browser, and a top-level reference to either throws on
 // import. The IDEs import pngToChr() straight from this module, so the module
 // body must stay environment-agnostic.
+// Node's require, reached without a static `node:fs` import and without a
+// top-level `await import` (which would make this module async and get it
+// rejected by bundlers targeting the browser).
 if (typeof process !== "undefined" && import.meta.url === `file://${process.argv[1]}`) {
-  const { readFileSync, writeFileSync } = await import("node:fs");
+  const { readFileSync, writeFileSync } = process.getBuiltinModule("fs");
   const args = process.argv.slice(2);
   const oIdx = args.indexOf("-o");
   const out = oIdx !== -1 ? args[oIdx + 1] : null;
