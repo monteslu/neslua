@@ -128,6 +128,15 @@ through - the same one the whole SDK family and the romdev playtest tool use).
 The window needs `@kmamal/sdl`, an *optional* dependency of the runner. No
 native compiler or emulator to install.
 
+## Real PICO-8 carts
+
+neslua compiles a PICO-8-flavored Lua dialect, not arbitrary PICO-8 carts.
+luacretro 0.2.0 adds a second tier that compiles unmodified `.p8` carts
+(tables, closures, coroutines, strings), but it needs a 32-bit C compiler
+with 64-bit integers and far more RAM than the NES has (2 KB of work RAM), so it
+targets the GBA (gbalua), the Genesis (mdlua) and sync32 instead. See
+luacretro's DYNAMIC.md.
+
 ## License
 
 MIT. No commercial game names in the shipped docs; the API is generic.
